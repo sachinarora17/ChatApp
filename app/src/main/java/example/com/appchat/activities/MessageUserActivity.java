@@ -5,7 +5,7 @@ import android.os.Bundle;
 
 import example.com.appchat.R;
 
-public class MainActivity extends AppCompatActivity {
+public class MessageUserActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

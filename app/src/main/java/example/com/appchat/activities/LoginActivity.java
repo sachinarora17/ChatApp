@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -46,21 +47,42 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseUser currentUser;
     private ProgressDialog progressDialog;
 
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         init();
 
+        setTextToToolbar();
+
+        if (mAuth.getCurrentUser() != null) {
+
+            navigateToUsersScreen();
+
+        } else
+            Log.e("current user is", "null");
+
         loginBinding.btnLogin.setOnClickListener(v -> {
 
             if (checkValidation()) {
-
                 checkIfUserAlreadyExistOrNot();
 
             }
         });
+    }
+
+
+    /**
+     * Module Name			        :	setTextToToolbar
+     * Author Name					:	Sachin Arora
+     * Date							:	May, 30 2018
+     * Purpose						:	This method set the text to toolbar
+     **/
+
+    private void setTextToToolbar() {
+        loginBinding.includeToolbar.tvToolbarWriteNoteTitle.setText(getString(R.string.login));
+        loginBinding.includeToolbar.btnLogout.setVisibility(View.GONE);
+
     }
 
     /**
@@ -188,6 +210,7 @@ public class LoginActivity extends AppCompatActivity {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithEmail:success");
                         currentUser = mAuth.getCurrentUser();
+                        progressDialog.dismiss();
                         navigateToUsersScreen();
 
                     } else {
@@ -205,6 +228,7 @@ public class LoginActivity extends AppCompatActivity {
 
                         } else {
                             Log.e("other", "error");
+                            progressDialog.dismiss();
                             Toast.makeText(this, AppConstants.sUnknownError, Toast.LENGTH_SHORT).show();
 
                         }

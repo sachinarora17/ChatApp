@@ -13,4 +13,5 @@ public class AppConstants {
     public static String sUnknownError = "Some Unknown error occurred...Try again later";
     public static String sErrorAddingUser = "Some error occur while adding user to database...try again later";
     public static String sPasswordLength = "Password should be 6 or more digits";
+    public static String sUserData = "userData";
 }
