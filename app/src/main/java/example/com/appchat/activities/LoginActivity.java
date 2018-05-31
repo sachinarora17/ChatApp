@@ -1,3 +1,10 @@
+/**
+ * Module Name/Class			:	LoginActivity
+ * Author Name					:	Sachin Arora
+ * Date							:	May,30 2018
+ * Purpose						:	This class login/ signup user to FCM Database
+ */
+
 package example.com.appchat.activities;
 
 import android.app.ProgressDialog;
@@ -11,6 +18,8 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -28,7 +37,6 @@ import example.com.appchat.utility.EmailValidator;
 public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = LoginActivity.class.getSimpleName();
-    private DatabaseReference myRef;
     private FirebaseDatabase database;
     private ActivityLoginBinding loginBinding;
     private FirebaseAuth mAuth;
@@ -49,18 +57,18 @@ public class LoginActivity extends AppCompatActivity {
 
             if (checkValidation()) {
 
-                if (checkIfUserAlreadyExistOrNot())
-                    navigateToUsersScreen();
-                else
-                    signUpNewUser();
+                checkIfUserAlreadyExistOrNot();
 
             }
         });
-
-        // setValueToDatabase();
-
-        //readDataFromDatabase();
     }
+
+    /**
+     * Module Name			        :	signUpNewUser
+     * Author Name					:	Sachin Arora
+     * Date							:	May, 30 2018
+     * Purpose						:	This method sign up the user to FCM Authentication
+     **/
 
     private void signUpNewUser() {
         mAuth.createUserWithEmailAndPassword(sEmail, sPassword)
@@ -72,21 +80,38 @@ public class LoginActivity extends AppCompatActivity {
 
                         if (currentUser != null) {
                             saveValuesToDatabase();
+
                         } else {
+                            progressDialog.dismiss();
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                            Toast.makeText(this, AppConstants.sErrorAddingUser, Toast.LENGTH_SHORT).show();
+
                             currentUser = null;
                         }
+                    } else {
+                        if (progressDialog.isShowing())
+                            progressDialog.dismiss();
+                        Toast.makeText(this, AppConstants.sErrorAddingUser, Toast.LENGTH_SHORT).show();
+
                     }
                 });
     }
 
+    /**
+     * Module Name			        :	saveValuesToDatabase
+     * Author Name					:	Sachin Arora
+     * Date							:	May, 30 2018
+     * Purpose						:	This method adds extra values(Apart form email,password) to FCM database.
+     **/
+
     private void saveValuesToDatabase() {
 
-        progressDialog.show();
+        if (!progressDialog.isShowing())
+            progressDialog.show();
         String userId = currentUser.getUid();
 
-        myRef = database.getReference().child(AppConstants.sUserTable).child(userId);
+        DatabaseReference myRef = database.getReference().child(AppConstants.sUserTable).child(userId);
 
         HashMap<String, String> userDetailsHashMap = new HashMap<>();
         userDetailsHashMap.put(AppConstants.sName, sName);
@@ -96,11 +121,25 @@ public class LoginActivity extends AppCompatActivity {
         navigateToUsersScreen();
     }
 
+    /**
+     * Module Name			        :	navigateToUsersScreen
+     * Author Name					:	Sachin Arora
+     * Date							:	May, 30 2018
+     * Purpose						:	This method intent user to next activity
+     **/
+
     private void navigateToUsersScreen() {
-         Intent intent = new Intent(this, AllUsersActivity.class);
+        Intent intent = new Intent(this, AllUsersActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
+
+    /**
+     * Module Name			        :	checkValidation
+     * Author Name					:	Sachin Arora
+     * Date							:	May, 30 2018
+     * Purpose						:	This method check validation on all fields
+     **/
 
     private boolean checkValidation() {
 
@@ -120,6 +159,10 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(this, AppConstants.sPasswordEmpty, Toast.LENGTH_SHORT).show();
             return false;
 
+        } else if (sPassword.length() < 6) {
+            Toast.makeText(this, AppConstants.sPasswordLength, Toast.LENGTH_SHORT).show();
+            return false;
+
         } else if (sName.isEmpty()) {
             Toast.makeText(this, AppConstants.sNameEmpty, Toast.LENGTH_SHORT).show();
             return false;
@@ -128,7 +171,16 @@ public class LoginActivity extends AppCompatActivity {
             return true;
     }
 
-    private boolean checkIfUserAlreadyExistOrNot() {
+    /**
+     * Module Name			        :	checkIfUserAlreadyExistOrNot
+     * Author Name					:	Sachin Arora
+     * Date							:	May, 30 2018
+     * Purpose						:	This method check whether user is already exists in FCM Authentication or not.
+     **/
+
+    private void checkIfUserAlreadyExistOrNot() {
+
+        progressDialog.show();
 
         mAuth.signInWithEmailAndPassword(sEmail, sPassword)
                 .addOnCompleteListener(this, task -> {
@@ -136,20 +188,36 @@ public class LoginActivity extends AppCompatActivity {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithEmail:success");
                         currentUser = mAuth.getCurrentUser();
+                        navigateToUsersScreen();
+
                     } else {
                         // If sign in fails, display a message to the user.
-                        Log.w(TAG, "signInWithEmail:failure", task.getException());
+                        Log.w(TAG, "signInWithEmail:failure" + task.getException());
+
+                        if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+                            Log.e("invalid credentials", "True");
+                            progressDialog.dismiss();
+                            Toast.makeText(this, AppConstants.sInvalidCredentials, Toast.LENGTH_SHORT).show();
+
+                        } else if (task.getException() instanceof FirebaseAuthInvalidUserException) {
+                            Log.e("invalid user", "True");
+                            signUpNewUser();
+
+                        } else {
+                            Log.e("other", "error");
+                            Toast.makeText(this, AppConstants.sUnknownError, Toast.LENGTH_SHORT).show();
+
+                        }
                     }
                 });
-
-        if (currentUser != null)
-            return true;
-        else {
-            Toast.makeText(LoginActivity.this, AppConstants.sAuthFailed,
-                    Toast.LENGTH_SHORT).show();
-            return false;
-        }
     }
+
+    /**
+     * Module Name			        :	init
+     * Author Name					:	Sachin Arora
+     * Date							:	May, 30 2018
+     * Purpose						:	This method initials all the objects.
+     **/
 
     private void init() {
 
@@ -162,35 +230,4 @@ public class LoginActivity extends AppCompatActivity {
         currentUser = null;
         mAuth = FirebaseAuth.getInstance();
     }
-
-    private void readDataFromDatabase() {
-        // Read from the database
-        myRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-                HashMap value = dataSnapshot.getValue(HashMap.class);
-                Log.d(TAG, "Value is: " + value.get("name"));
-                Log.d(TAG, "password is: " + value.get("password"));
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w(TAG, "Failed to read value.", error.toException());
-            }
-        });
-    }
-
-    private void setValueToDatabase() {
-
-        HashMap<String, String> mUser = new HashMap<>();
-        mUser.put("name", "sachin");
-        mUser.put("password", "123456");
-        // Write a message to the database
-        myRef.setValue(mUser);
-    }
-
-
 }
