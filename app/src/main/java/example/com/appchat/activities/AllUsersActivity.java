@@ -1,3 +1,10 @@
+/**
+ * Module Name/Class			:	AllUsersActivity
+ * Author Name					:	Sachin Arora
+ * Date							:	May,31 2018
+ * Purpose						:	This class fetch all users from FCM database
+ */
+
 package example.com.appchat.activities;
 
 import android.app.ProgressDialog;
@@ -56,11 +63,25 @@ public class AllUsersActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Module Name			        :	setLayoutManager
+     * Author Name					:	Sachin Arora
+     * Date							:	May, 31 2018
+     * Purpose						:	This method set layout to recycler view
+     **/
+
     private void setLayoutManager() {
         LinearLayoutManager lmAllUsers = new LinearLayoutManager(this);
         allUsersBinding.rvUsers.setLayoutManager(lmAllUsers);
 
     }
+
+    /**
+     * Module Name			        :	getAllChildList
+     * Author Name					:	Sachin Arora
+     * Date							:	May, 31 2018
+     * Purpose						:	This method make reference to database and get all its child
+     **/
 
     private void getAllChildList() {
         DatabaseReference childReference = database.getReference(AppConstants.sUserTable);
@@ -103,13 +124,19 @@ public class AllUsersActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Module Name			        :	saveUsersDataToArrayList
+     * Author Name					:	Sachin Arora
+     * Date							:	May, 31 2018
+     * Purpose						:	This method save users data to array list
+     **/
+
     private void saveUsersDataToArrayList(DataSnapshot dataSnapshot) {
 
         if (progressDialog.isShowing())
             progressDialog.dismiss();
         User user = dataSnapshot.getValue(User.class);
         userArrayList.add(user);
-        Log.i(TAG, "add university name = " + user.getName());
 
         Log.e("list size is", userArrayList.size() + "");
 
@@ -129,6 +156,13 @@ public class AllUsersActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Module Name			        :	getCurrentUserDetails
+     * Author Name					:	Sachin Arora
+     * Date							:	May, 31 2018
+     * Purpose						:	This method get current user detail(who is logged in)
+     **/
+
     private void getCurrentUserDetails() {
 
         progressDialog.show();
@@ -141,6 +175,13 @@ public class AllUsersActivity extends AppCompatActivity {
 
         }
     }
+
+    /**
+     * Module Name			        :	valueEventListener
+     * Author Name					:	Sachin Arora
+     * Date							:	May, 31 2018
+     * Purpose						:	This is a listener which listens to data change in database
+     **/
 
     private ValueEventListener valueEventListener = new ValueEventListener() {
         @Override
@@ -158,12 +199,26 @@ public class AllUsersActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * Module Name			        :	setTextToToolbar
+     * Author Name					:	Sachin Arora
+     * Date							:	May, 31 2018
+     * Purpose						:	This method set logged in user name to toolbar
+     **/
+
     private void setTextToToolbar(String name) {
         allUsersBinding.includeToolbar.tvToolbarWriteNoteTitle.setText(name);
         myRef.removeEventListener(valueEventListener);
         getAllChildList();
 
     }
+
+    /**
+     * Module Name			        :	signOutFirebaseAndNavigateToLoginPage
+     * Author Name					:	Sachin Arora
+     * Date							:	May, 31 2018
+     * Purpose						:	This method log out user from FCM database and then navigating it to login page
+     **/
 
     private void signOutFirebaseAndNavigateToLoginPage() {
 
@@ -172,6 +227,13 @@ public class AllUsersActivity extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
+
+    /**
+     * Module Name			        :	init
+     * Author Name					:	Sachin Arora
+     * Date							:	May, 31 2018
+     * Purpose						:	This method initializes all the object
+     **/
 
     private void init() {
 

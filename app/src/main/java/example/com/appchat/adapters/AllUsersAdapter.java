@@ -1,3 +1,10 @@
+/**
+ * Module Name/Class			:	AllUsersAdapter
+ * Author Name					:	Sachin Arora
+ * Date							:	May,31 2018
+ * Purpose						:	This adapter shows all user
+ */
+
 package example.com.appchat.adapters;
 
 import android.databinding.DataBindingUtil;

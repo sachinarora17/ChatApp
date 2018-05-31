@@ -1,11 +1,15 @@
+/**
+ * Module Name/Class			:	EmailValidator
+ * Author Name					:	Sachin Arora
+ * Date							:	May,31 2018
+ * Purpose						:	This class validated the email which user entered
+ */
+
 package example.com.appchat.utility;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Class is used to validate email
- */
 public class EmailValidator {
 
     private Pattern pattern;
