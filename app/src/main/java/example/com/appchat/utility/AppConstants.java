@@ -14,4 +14,5 @@ public class AppConstants {
     public static String sErrorAddingUser = "Some error occur while adding user to database...try again later";
     public static String sPasswordLength = "Password should be 6 or more digits";
     public static String sUserData = "userData";
+    public static String sDeviceToken = "device_token";
 }

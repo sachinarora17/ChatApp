@@ -9,13 +9,23 @@ import com.google.firebase.database.IgnoreExtraProperties;
 public class User implements Parcelable {
 
     private String name;
+    private String deviceToken;
 
     public User() {
 
     }
 
-    public User(String name) {
+    public User(String name, String deviceToken) {
         this.name = name;
+        this.deviceToken = deviceToken;
+    }
+
+    public String getDeviceToken() {
+        return deviceToken;
+    }
+
+    public void setDeviceToken(String deviceToken) {
+        this.deviceToken = deviceToken;
     }
 
     public String getName() {
@@ -34,13 +44,15 @@ public class User implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.name);
+        dest.writeString(this.deviceToken);
     }
 
     protected User(Parcel in) {
         this.name = in.readString();
+        this.deviceToken = in.readString();
     }
 
-    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
+    public static final Creator<User> CREATOR = new Creator<User>() {
         @Override
         public User createFromParcel(Parcel source) {
             return new User(source);
